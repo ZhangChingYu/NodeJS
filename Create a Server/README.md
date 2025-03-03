@@ -153,6 +153,10 @@ writeHead 會**立即發送標頭**，這樣後續的 response.write() 和 respo
 在 Node.js 中，response 物件是一個 可寫流 (WritableStream)，所以可以使用**Stream 的方法**來寫入數據，例如：
 ```javascript
 response.write('<html>')
+response.write('<body>')
+response.write('<h1>Hello World 🥳</h1>')
+response.write('</body>')
+response.write('</html>')
 // or
 response.end('<html><body><h1>Hello, World!</h1></body></html>');
 ```
