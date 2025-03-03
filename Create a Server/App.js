@@ -3,7 +3,10 @@ const http = require('node:http')
 // we use createServer() to create a web server object.
 const server = http.createServer((request, response) => {
     const { headers, method, url } = request
-    const userAgent = headers['user-agent']
+    // const userAgent = headers['user-agent']
+    if(method === 'GET') {
+        console.log('GET')
+    }
     let body = []
     request
         .on('error', err => {
@@ -16,31 +19,19 @@ const server = http.createServer((request, response) => {
         })
         .on('end', () => {
             body = Buffer.concat(body).toString()
+            /* BEGINNING OF NEW STUFF */
+
+            response.statusCode = 200
+            response.setHeader('content-type', 'application/json')
+            // Note: the 2 lines above could be replaced with this next noe:
+            // response.writeHead(200, {'content-type', 'application/json})
+
+            const responseBody = { headers, method, url, body }
+            response.write(JSON.stringify(responseBody))
+            response.end()
+            // Note: the 2 lines above can be replaced with this next one:
+            // response.end(JSON.stringify(responseBody))
+            
+            /* END OF NEW STUFF */
         })
-    
-    // tell the client that the resource wasn't found
-    response.statusCode = 404
-    response.setHeader('Content-Type', 'application/json')
-    response.setHeader('X-Powered-By', 'bacon')
-
-    response.writeHead(200, {
-        'content-type': 'application/json',
-        'X-Powered-By':'bacon'  // this is an example of self-defined header
-    })
-
-    response.write('<html>')
-    response.write('<body>')
-    response.write('<h1>Hello World 🥳</h1>')
-    response.write('</body>')
-    response.write('</html>')
-    response.end()
-
-    response.end('<html><body><h1>Hello, World!</h1></body></html>');
-
 }).listen(8080)
-
-
-
-server.on('request', (request, response) => {
-    // the request object is an instance of 'IncomingMessage'
-})
