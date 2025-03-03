@@ -78,3 +78,42 @@ npm app.js
     ├── index.pug
     └── layout.pug
 ```
+
+## 基礎 Routing
+在 Web 開發 中，Routing（路由） 指的是決定應用如何響應來自客戶端的請求，通常根據 URL（路徑） 和 HTTP 方法（如 GET、POST、PUT、DELETE） 來處理不同的請求。
+
+### 路由的組成部分：
+- 路徑（PATH）：請求的網址，如 /users 或 /products/123
+- HTTP 方法 (METHOD)：GET（獲取資料）、POST（創建資料）、PUT（更新資料）、DELETE（刪除資料）
+- 處理函數（HANDLER）：當請求符合條件時執行的函數
+```javascript
+app.METHOD(PATH, HANDLER)
+``` 
+
+### GET 請求
+```javascript
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+```
+
+### POST 請求
+```javascript
+app.post('/', (req, res) => {
+    res.send('Got a POST request')
+})
+```
+
+### PUT 請求
+```javascript
+app.put('/user', (req, res) => {
+    res.send('Got a PUT request at /user')
+})
+```
+
+### DELETE 請求
+```javascript
+app.delete('/user', (req, res) => {
+    res.send('Got a DELETE request at /user')
+})
+```
