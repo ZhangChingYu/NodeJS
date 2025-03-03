@@ -225,10 +225,16 @@ const server = http.createServer((request, response) => {
 這些技能已經足夠構建一個基本的 HTTP 伺服器！ 🎉
 
 ## 下一步可以探索的內容
-1. 使用 Express 框架簡化開發: Express 讓**路由、請求處理、錯誤處理**更簡潔，推薦學習！
-2. Middleware (中介軟體): 在 http.createServer() 中，所有請求都走進同一個回呼函式。使用 Middleware 可以拆分邏輯，比如記錄日誌、驗證請求、解析 JSON 。
+### 1. 使用 Express 框架簡化開發: 
+Express 讓**路由、請求處理、錯誤處理**更簡潔，推薦學習！
+### 2. Middleware (中介軟體): 
+在 http.createServer() 中，所有請求都走進同一個回呼函式。使用 Middleware 可以拆分邏輯，比如記錄日誌、驗證請求、解析 JSON 。
 (Express 框架有強大的 Middleware 機制)
-3. 進階的錯誤處理: 我們已經學會了監聽 'error' 事件，接下來可以嘗試：為所有請求、一處理錯誤、返回有意義的錯誤訊息。
-4. 文件串流和大文件處理: 你可以使用 fs.createReadStream() 來處理大文件，而不是一次性載入。
-5. 連接資料庫 (MongoDB, MySQL, PostgreSQL): 使用 mongoose 來操作  MongoDB，使用 mysql2 或 pg 來處理關聯式資料庫。
-6. WebSockets: 如果你想處理即時通信，可以學習 `ws` 模組來處理 WebSockets。
+### 3. 進階的錯誤處理: 
+我們已經學會了監聽 'error' 事件，接下來可以嘗試：為所有請求、一處理錯誤、返回有意義的錯誤訊息。
+### 4. 文件串流和大文件處理: 
+可以使用 fs.createReadStream() 來處理大文件，而不是一次性載入。
+### 5. 連接資料庫 (MongoDB, MySQL, PostgreSQL): 
+使用 mongoose 來操作  MongoDB，使用 mysql2 或 pg 來處理關聯式資料庫。
+### 6. WebSockets: 
+如果想處理即時通信，可以學習 `ws` 模組來處理 WebSockets。
