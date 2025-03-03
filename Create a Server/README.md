@@ -121,7 +121,7 @@ response.statusCode = 404
 response.setHeader('Content-Type', 'application/json')
 response.setHeader('X-Powered-By', 'bacon')
 ```
-### 發送 Header 數據
+### 發送 Response Header 數據
 在預設情況下，Node.js 會在你 第一次寫入回應主體 (body) 之前，自動發送標頭。這種方式稱為**隱式標頭 (implicit headers)**。例如：
 
 ```javascript
@@ -148,3 +148,23 @@ writeHead 會**立即發送標頭**，這樣後續的 response.write() 和 respo
 - 隱式標頭：讓 Node.js 自動在發送回應主體前設置標頭 (setHeader() + statusCode)。
 - 顯式標頭：使用 writeHead(statusCode, headers) 來明確發送標頭。
 - writeHead() 會立即發送標頭，所以之後不能再用 setHeader() 修改。
+
+## 發送 Response Body 數據
+在 Node.js 中，response 物件是一個 可寫流 (WritableStream)，所以可以使用**Stream 的方法**來寫入數據，例如：
+```javascript
+response.write('<html>')
+// or
+response.end('<html><body><h1>Hello, World!</h1></body></html>');
+```
+end() 方法有兩個作用，一個是關閉回應流 (stream)，表示回應結束，另一個是發送最後一部分數據（可選）。
+
+如果你想分多次寫入數據，可以使用 write() 來逐步發送，然後用 end() 結束。
+
+⚠️需要注意的是，標頭 (headers) 必須在開始寫入數據前設置，因為 HTTP 協議的標頭部分在主體之前。
+
+❌錯誤示範：
+```javascript
+response.write('Hello, world!');
+response.writeHead(200, { 'Content-Type': 'text/plain' });
+
+```

@@ -27,6 +27,16 @@ const server = http.createServer((request, response) => {
         'content-type': 'application/json',
         'X-Powered-By':'bacon'  // this is an example of self-defined header
     })
+
+    response.write('<html>')
+    response.write('<body>')
+    response.write('<h1>Hello World 🥳</h1>')
+    response.write('</body>')
+    response.write('</html>')
+    response.end()
+
+    response.end('<html><body><h1>Hello, World!</h1></body></html>');
+
 }).listen(8080)
 
 
