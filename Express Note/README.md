@@ -117,3 +117,25 @@ app.delete('/user', (req, res) => {
     res.send('Got a DELETE request at /user')
 })
 ```
+### All 請求
+有一個特殊的路由方法 app.all()，可用於所有 HTTP 的請求方。無論使用 GET、POST、PUT、DELETE，或其他 http 模組中支援的任何請求方法，都會對路由的請求執行處理程序。
+```javascript
+app.all('/secret', (req, res, next) => {
+    console.log('Accessing the secret section...')
+    next() // pass control to the next handler
+})
+```
+## 路徑 Patterns: 正則表達式(Regex)
+- **?**: 代表前面的字符可有可無（0 次或 1 次）
+    - ex. '/ab?cd' (✅/acd, ✅/abcd, ❌/abbcd)
+    - ex. '/ab(cd)?e': ? 作用於()內的內容
+- **+**: 前面的字符必須至少出現 1 次（1 次或多次）。
+    - ex. '/ab+cd' (✅/abcd, ✅/abbcd, ✅abbbcd, ✅abbbbbbcd, ❌/acd)
+- **$*$**: 前面的字符可以出現 0 次或多次，甚至可以被任何字符替代。
+    - ex. '/ab*cd' (✅/abcd, ✅/abxcd, ✅/abJIESJcd, ✅/ab124cd, ❌/acd)
+- /a/: 這條路由會匹配任何包含字母 a 的 URL，因為 /a/ 是一個正則表達式，表示「URL 中包含 a 即可匹配」。
+    ex. /apple ✅（包含 a），/banana ✅（包含 a）
+- /.*fly$/: 這條路由匹配任何以 fly 結尾的 URL：
+    - .: 表示匹配任何字符（除了換行符）。
+    - *: 表示前面的 . 可以出現 0 次或多次。
+    - fly$: 表示以 fly 為結尾（$ 代表「結尾」）。
