@@ -61,3 +61,23 @@ server.on('request', (request, response) => {
     })
 })
 ```
+
+## Errors
+請求物件既是一個 ReadableStream，也是 EventEmitter，這意味著它可以像其他事件發射器一樣觸發事件，包括錯誤事件。
+
+當請求流發生錯誤時，它會觸發 'error' 事件。如果你沒有為這個事件添加監聽器，那麼錯誤就會被拋出，進而可能導致整個 Node.js 程式崩潰。
+
+因此，建議在使用請求流時，一定要添加一個 'error' 監聽器。即使你只是記錄錯誤並繼續運行，這樣也能防止程式因未處理的錯誤而崩潰。更好的做法是當發生錯誤時，能向客戶端返回一個合適的 HTTP 錯誤響應。
+
+除了手動添加 'error' 監聽器之外，還有一些工具和抽象層（例如一些中間件、錯誤處理庫）可以幫助你自動處理這些錯誤。但無論如何，你都必須意識到錯誤是不可避免的，並且需要有適當的機制來處理它們。
+
+```javascript
+server.on('request', (request, response) => {
+    let body = []
+    request.on('error', err => {
+        // this prints the error message and stack trace to 'stderr'
+        console.error(err.stack)
+    })
+})
+```
+---

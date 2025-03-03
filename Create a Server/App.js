@@ -2,23 +2,19 @@ const http = require('node:http')
 
 // we use createServer() to create a web server object.
 const server = http.createServer((request, response) => {
-    // magic happens here!
-})
-
-
-
-server.on('request', (request, response) => {
-    // the request object is an instance of 'IncomingMessage'
-    const { method, url } = request
-    const { headers } = request
+    const { headers, method, url } = request
     const userAgent = headers['user-agent']
-
     let body = []
-    request.on('data', chunk => {
-        body.push(chunk)
-    })
-    .on('end', () => {
-        body = Buffer.concat(body).toString()
-        // at this point, 'body' has the entire request body
-    })
-})
+    request
+        .on('error', err => {
+            // this prints the error message and stack trace to 'stderr'
+            console.error(err)
+        })
+        .on('data', chunk => {
+            body.push(chunk)
+            // at this point, 'body' has the entire request body
+        })
+        .on('end', () => {
+            body = Buffer.concat(body).toString()
+        })
+}).listen(8080)
