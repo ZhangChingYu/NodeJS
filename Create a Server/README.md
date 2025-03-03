@@ -80,4 +80,71 @@ server.on('request', (request, response) => {
     })
 })
 ```
----
+### 一個基本的 HTTP Server
+這段代碼展示了一個基本的 Node.js HTTP 伺服器，它可以接收請求並解析其中的 標頭 (headers)、請求方法 (method)、URL 和請求主體 (body)，但它目前**沒有返回任何響應**，導致客戶端的請求會超時。
+
+```javascript
+const http = require('node:http')
+
+// we use createServer() to create a web server object.
+const server = http.createServer((request, response) => {
+    const { headers, method, url } = request
+    const userAgent = headers['user-agent']
+    let body = []
+    request
+        .on('error', err => {
+            // this prints the error message and stack trace to 'stderr'
+            console.error(err)
+        })
+        .on('data', chunk => {
+            body.push(chunk)
+            // at this point, 'body' has the entire request body
+        })
+        .on('end', () => {
+            body = Buffer.concat(body).toString()
+        })
+}).listen(8080)
+```
+在下一部分，我們會介紹 response 物件，它是一個 WritableStream，可以用來回應客戶端，並結束請求循環。
+
+## HTTP Status Code
+如果不特別設定的話，response 的 Status Code 會是200，在需要時，我們可以通過 setStatusCode 方法來指定
+```javascript
+// tell the client that the resource wasn't found
+response.statusCode = 404
+```
+
+## Response Header
+### 設置 Response Header
+我們可以通過 setHeader 方法來方便的設置 Headers。在回應上設定標題時，名稱是不區分大小寫的。如果重複設定 Headers，則最後設定的值就是到時候發送出去的值。
+```javascript
+response.setHeader('Content-Type', 'application/json')
+response.setHeader('X-Powered-By', 'bacon')
+```
+### 發送 Header 數據
+在預設情況下，Node.js 會在你 第一次寫入回應主體 (body) 之前，自動發送標頭。這種方式稱為**隱式標頭 (implicit headers)**。例如：
+
+```javascript
+response.statusCode = 200;  // 設定狀態碼
+response.setHeader('Content-Type', 'application/json'); // 設定標頭
+response.end(JSON.stringify({ message: 'Hello, world!' })); // 發送回
+// 應
+```
+
+這裡**沒有明確指示**何時發送標頭，Node.js 會在 response.end() 之前自動發送。
+如果你想要**手動**控制標頭的發送時機，可以使用 writeHead：
+
+```javascript
+response.writeHead(200, {
+  'Content-Type': 'application/json',
+  'X-Powered-By': 'bacon',
+});
+```
+
+writeHead 會**立即發送標頭**，這樣後續的 response.write() 和 response.end() 只會影響回應主體 (body)，不會再影響標頭。
+
+如果你用 writeHead()，就不需要再用 setHeader()，因為 writeHead() 會一次性設置所有標頭。
+#### 小結
+- 隱式標頭：讓 Node.js 自動在發送回應主體前設置標頭 (setHeader() + statusCode)。
+- 顯式標頭：使用 writeHead(statusCode, headers) 來明確發送標頭。
+- writeHead() 會立即發送標頭，所以之後不能再用 setHeader() 修改。

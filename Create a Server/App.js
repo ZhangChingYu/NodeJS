@@ -17,4 +17,20 @@ const server = http.createServer((request, response) => {
         .on('end', () => {
             body = Buffer.concat(body).toString()
         })
+    
+    // tell the client that the resource wasn't found
+    response.statusCode = 404
+    response.setHeader('Content-Type', 'application/json')
+    response.setHeader('X-Powered-By', 'bacon')
+
+    response.writeHead(200, {
+        'content-type': 'application/json',
+        'X-Powered-By':'bacon'  // this is an example of self-defined header
+    })
 }).listen(8080)
+
+
+
+server.on('request', (request, response) => {
+    // the request object is an instance of 'IncomingMessage'
+})
