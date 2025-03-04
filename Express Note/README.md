@@ -139,3 +139,31 @@ app.all('/secret', (req, res, next) => {
     - .: 表示匹配任何字符（除了換行符）。
     - *: 表示前面的 . 可以出現 0 次或多次。
     - fly$: 表示以 fly 為結尾（$ 代表「結尾」）。
+
+## Parameters 路由參數
+路由參數是URL中的命名片段，用來擷取URL中特定位置的值。捕獲的值會被填入req.params物件中，而路由參數的名字會作為req.params物件的鍵。
+
+假設你有一個路由路徑定義為 /users/:userId，其中 :userId 就是一個路由參數。
+
+如果使用者存取的URL是 /users/123/books/4，那麼 123 會被捕獲，並儲存在 req.params.userId 中，4 會被捕獲，並存在 req.params.bookId。因此服務器返回的是 **{"userId":"123","bookId":"4"}**。
+```javascript
+app.get('/users/:userId/books/:bookId', (req, res) => {
+    res.send(JSON.stringify(req.params))
+})
+```
+要注意，Parameter 的命名不能包含 '**.**' 或 '**-**'，我可以進一步利用這個特性：
+
+此時，我們的請求 URL 可以是 '/flights/LAX-SFO'，req.param = {from: 'LAX', to:'SFO}，這不僅縮短了 URL 的長度，也讓可讀性提升了。
+```javascript
+app.get('/flights/:from-:to', (req, res) => {
+    res.send(JSON.stringify(req.params))
+})
+```
+如果想更精確的控制路徑參數的屬性，可以通過 regular expression 來實現，例如：
+```javascript
+// 此時/user/只能接收數字作為參數
+app.get('/user/:userId(\\d+)', (req, res) => {
+    res.send(req.params.userId)
+})
+```
+
