@@ -236,7 +236,7 @@ app.get('/hello', (req, res) => {
     console.log('Received a request'); // 只打印日誌，沒有調用 res.send() 或其他響應方法
 });
 ```
-### 常見的 **res** 方法
+### 💡常見的 **res** 方法
 | 方法 | 作用 |
 | --- | --- |
 |res.send(data)|發送字符串、JSON 或 Buffer 作為響應|
@@ -249,3 +249,68 @@ app.get('/hello', (req, res) => {
 |res.jsonp()|發送 JSONP（JSON with Padding） 格式的數據，用於跨域請求|
 |res.sendFile()|向客戶端發送文件（但不像 res.download() 那樣會觸發下載，這裡只是直接顯示）|
 |res.sendStatus()|發送一個 HTTP 狀態碼，並自動設置對應的狀態消息|
+
+## 鏈式路由 app.route()
+在 Express.js 中，**app.route()** 允許鏈式（chainable）定義同一路徑的不同 HTTP 方法，這樣可以讓代碼更簡潔，減少重複性和拼寫錯誤。
+
+app.route(path) 返回一個 可鏈式調用的路由對象，你可以對其添加 .get()、.post()、.put()、.delete() 等方法。這樣，我們不需要重複寫多次 app.get('/book', handler)，讓代碼更清晰且易於管理。
+```javascript
+app.route('/book')
+    .get((req, res) => {
+        res.send('Get a random book')
+    })
+    .post((req, res) => {
+        res.send('Add a book')
+    })
+    .put((req, res) => {
+        res.send('Update the book')
+    })
+```
+## 路由模塊化 expres.Router()
+在 Express.js 中，express.Router() 允許我們將路由模塊化，使代碼更結構化、更易管理。這樣的 Router 實例被稱為 "mini-app"，因為它擁有完整的中間件和路由系統
+
+我們首先在 app.js 的同目錄下創建 bird.js 文件，並輸入以下代碼：
+```javascript
+const express = require('express')
+const router = express.Router()
+
+// middleware that is specific to this router
+const timeLog = (req, res, next) => {
+    console.log('Time: ', Date.now())
+    next()
+}
+router.use(timeLog)
+
+// define the home page route
+router.get('/', (req, res) => {
+    res.send('Birds home page')
+})
+
+// define the about route
+router.get('/about', (req, res) => {
+    res.send('About birds')
+})
+
+module.exports = router
+```
+然後返回 app.js 並通過 require('./birds') 來引用這個路由：
+```javascript
+const express = require('express')
+const app = express()
+const port = 3000
+// 引用 birds 路由
+const birds = require('./birds')
+app.use('/birds', birds)
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+```
+當用戶訪問以 localhost:3000/birds 為前綴的路徑時，就會自動跳轉到 birds 路由了，此時 timeLog 函數會被調用並展示收到請求的時間。
+
+### express.Router() 的好處
+- 模塊化代碼：將路由分成不同的文件，讓 app.js 更簡潔。
+- 可重複使用：可以在不同的 Express 應用中重用相同的 Router 模塊。
+- 支持中間件：可以為某個 Router 設定專屬的中間件，而不影響全局應用。
+
+這種方式特別適合大型應用，比如 API 設計時，可以將 users.js、products.js、orders.js 各自分成獨立的路由模塊，使結構更清晰。🚀

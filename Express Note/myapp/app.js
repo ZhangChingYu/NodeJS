@@ -8,7 +8,7 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-app.get(/a/, (req, res) => {
+app.get(/z/, (req, res) => {
     res.send(req.url)
 })
 
@@ -82,6 +82,23 @@ app.all('/secret', (req, res, next) => {
     console.log('Accessing the secret section...')
     next() // pass control to the next handler
 })
+
+/** APP ROUTE */
+
+app.route('/book')
+    .get((req, res) => {
+        res.send('Get a random book')
+    })
+    .post((req, res) => {
+        res.send('Add a book')
+    })
+    .put((req, res) => {
+        res.send('Update the book')
+    })
+
+/** EXPRESS ROUTER */
+const birds = require('./birds')
+app.use('/birds', birds)
 
 /** RUN */
 
