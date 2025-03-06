@@ -323,3 +323,30 @@ router.get('/:id', (req, res) => {
     res.send(req.params.id)
 })
 ```
+
+## 提供靜態文件
+在 Express.js 中，我們可以使用 express.static 中間件來提供靜態文件（如圖片、CSS、JS等）。這樣，客戶端就可以直接訪問這些文件，而不需要通過特定的路由處理請求。
+
+我們在 app.js 的同級目錄下創建 public 文件夾並放置一張圖片 image.jpg，我們可以使用 express.static() 來託管 public 目錄中的文件：
+```javascript
+const express = require('express')
+const app = express()
+const port = 3000
+
+const path = require('path'); // 引入 path 模塊以獲取絕對路徑
+// 設置靜態文件夾（使用絕對路徑更安全）
+app.use('/static', express.static(path.join(__dirname, 'public')));
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+```
+當我們啟動 Express 應用後，客戶端可以通過以下 URL 訪問靜態資源：
+```bash
+http://localhost:3000/static/images.jpg
+```
+### 為什麼要使用 express.static() 呢？
+- ✅ 自動提供靜態文件，無需手動定義路由
+- ✅ 提升性能，避免頻繁進入 Express 路由處理
+- ✅ 支持設置虛擬路徑前綴，讓 URL 結構更靈活
+- ✅ 適用於部署 Web 前端資源（如圖片、CSS、JS 等）
