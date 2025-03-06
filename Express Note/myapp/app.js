@@ -28,6 +28,36 @@ app.get('/user/:userId(\\d+)', (req, res) => {
     res.send(req.params.userId)
 })
 
+app.get('/test', (req, res, next) => {
+    console.log('the response will be sent by the next function... ')
+    next()
+}, (req, res) => {
+    res.send('From next function.')
+})
+
+const cb1 = function (req, res, next) {
+    console.log('CB1')
+    next()
+}
+
+const cb2 = function (req, res, next) {
+    console.log('CB2')
+    next()
+}
+
+const cb3 = function (req, res) {
+    res.send('This is 3')
+}
+
+app.get('/test/c', [cb1, cb2, cb3])
+
+app.get('/test/d', [cb1, cb2], (req, res, next) => {
+    console.log('the response will be sent by the next function...')
+    next()
+}, (req, res) => {
+    res.send('This is 4')
+})
+
 /** POST */
 
 app.post('/', (req, res) => {

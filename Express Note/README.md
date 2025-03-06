@@ -166,4 +166,86 @@ app.get('/user/:userId(\\d+)', (req, res) => {
     res.send(req.params.userId)
 })
 ```
+## Route Handler
+你可以為一個請求提供多個回調函數，這些回呼函數的行為類似於中間件。唯一的例外是，這些回呼函數可以呼叫 next('route') 來跳過目前路由中剩餘的回呼函數。你可以利用這個機制為路由設定一些前置條件，如果目前路由沒有繼續執行的必要，就可以將控制權交給後續的路由。
+路由處理程序（Route Handlers）可以是以下形式：
+- 單一函數
+```javascript
+app.get('/user/:userId(\\d+)', (req, res) => {
+    res.send(req.params.userId)
+})
+```
+- 多個回調函數
+```javascript
+app.get('/test', (req, res, next) => {
+    console.log('the response will be sent by the next function... ')
+    next()
+}, (req, res) => {
+    res.send('From next function.')
+})
+```
+- 一個函數數組
+```javascript
+const cb1 = function (req, res, next) {
+    console.log('CB1')
+    next()
+}
 
+const cb2 = function (req, res, next) {
+    console.log('CB2')
+    next()
+}
+
+const cb3 = function (req, res) {
+    res.send('This is 3')
+}
+
+app.get('/test/c', [cb1, cb2, cb3])
+```
+- 上述兩種形式的組合
+```javascript
+app.get('/test/d', [cb1, cb2], (req, res, next) => {
+    console.log('the response will be sent by the next function...')
+    next()
+}, (req, res) => {
+    res.send('This is 4')
+})
+```
+
+### 詳細點說：
+1. 多個回調函數：你可以為一個路由定義多個回呼函數，它們會依序執行。這些回呼函數的行為類似於中間件，可以對請求進行處理。
+2. next('route')：如果某個回呼函數呼叫了 next('route')，則會跳過目前路由中剩餘的回呼函數，直接進入下一個符合的路由。這種機制可以用來實現一些前置條件檢查。如果檢查不通過，就直接跳過目前路由。
+3. 路由處理程序的形式： 路由處理程序可以是單一函數，也可以是函數數組，甚至是它們的組合。
+
+## Response Methods
+在 Express（或其他類似的 Web 框架）中，res（response 物件）的方法（例如 res.send()、res.json()、res.end()）可以向客戶端發送響應並結束請求-響應循環。
+
+如果在路由處理函數（route handler）中沒有調用這些方法，請求將會一直處於等待狀態，不會收到任何響應，導致客戶端一直掛起（hanging）。
+
+### ✅正確的做法
+這樣，客戶端請求 /hello 時，會收到 "Hello, World!"，請求順利結束。
+```javascript
+app.get('/hello', (req, res) => {
+    res.send('Hello, World!'); // 這裡發送了響應，請求-響應循環結束
+});
+```
+### ❌錯誤的做法
+這樣，客戶端會一直等不到伺服器的回應，因為 res.send() 或 res.end() 沒有被調用，請求一直在等待，沒有結束。
+```javascript
+app.get('/hello', (req, res) => {
+    console.log('Received a request'); // 只打印日誌，沒有調用 res.send() 或其他響應方法
+});
+```
+### 常見的 **res** 方法
+| 方法 | 作用 |
+| --- | --- |
+|res.send(data)|發送字符串、JSON 或 Buffer 作為響應|
+|res.json(obj)|發送 JSON 格式的響應|
+|res.end()|結束響應（不發送內容）|
+|res.redirect(url)|重定向客戶端到指定 URL|
+|res.status(code).send(data)|設置 HTTP 狀態碼並發送響應|
+|res.render(view, data)|渲染視圖並發送 HTML|
+|res.download(path [, filename] [, callback])|讓客戶端下載文件|
+|res.jsonp()|發送 JSONP（JSON with Padding） 格式的數據，用於跨域請求|
+|res.sendFile()|向客戶端發送文件（但不像 res.download() 那樣會觸發下載，這裡只是直接顯示）|
+|res.sendStatus()|發送一個 HTTP 狀態碼，並自動設置對應的狀態消息|
